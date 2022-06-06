@@ -10,11 +10,13 @@ namespace ball
     class Team
     {
         public:
-            Team();
-            ~Team();
+            Team(const string& name, double skill);
+            string getName() const;
+            double getSkill() const;
 
         private:
-            
+            string _name;
+            double _skill;
     };
     
 }
