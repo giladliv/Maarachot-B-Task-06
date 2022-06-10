@@ -30,11 +30,9 @@ void Schedule::createSeason()
     vector<string> teamsNames = _league.getTeamsList();
     _games.clear();
     _gamesVect.clear();
-    string strTeam1;
-    string strTeam2;
     for (const string& str: teamsNames)
     {
-        _games[str] = unordered_map<unsigned int, Game>();
+        _games[str] = unordered_map<unsigned int, Game*>();
     }
     // n - 1 rounds will make each team to play one with outhers, another (n - 1) rounds will make the opposite games
     _numSeasons = 2 * (_league.teamSize() - 1);
@@ -52,10 +50,8 @@ void Schedule::createSeason()
             Game g(home, guest);
             unsigned int ind = _gamesVect[roundNum].size() - 1;
             cout << _gamesVect[roundNum][ind] << endl;
-            _gMap[to_string(roundNum) + "::" + home] = Game(home, guest);
-            _gMap[to_string(roundNum) + "::" + guest] = Game(home, guest);
-            // getGame(strTeam2, roundNum).setGuestPoints(50);
-            // cout << getGame(strTeam1, roundNum).getGuestPoints() << endl;
+            _games[home][roundNum] = &Game(home, guest);
+            _games[guest][roundNum] = &Game(home, guest);
         }
         //get the last team
         string lastTeam = teamsNames.back();
@@ -129,25 +125,21 @@ void Schedule::throwIfNotCreated()
 
 Game& Schedule::getGame(const string& str, unsigned int r)
 {
-    return (_games[str].at(r));
+    return (*_games[str].at(r));
 }
 
 
 void Schedule::pr()
 {
-    // for (const auto& s: _games)
-    // {
-    //     cout << s.first <<  " -" << endl;
-    //     cout << string(20, '*') << endl;
-    //     for (const auto& r : _games[s.first] )
-    //     {
-    //         cout << r.first << " ";
-    //     }
-    //     cout << endl << endl;
-    // }
-
-    for (const auto& r : _gMap )
+    for (const auto& s: _games)
     {
-        cout << r.first << endl;
+        cout << s.first <<  " -" << endl;
+        cout << string(20, '*') << endl;
+        for (const auto& r : _games[s.first] )
+        {
+            cout << r.first << endl;
+            cout << r.second << endl;
+        }
+        cout << endl << endl;
     }
 }

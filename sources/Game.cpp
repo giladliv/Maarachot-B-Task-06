@@ -5,6 +5,10 @@ using ball::Team;
 
 Game::Game(const string& home, const string& guest): _home(home), _guest(guest)
 {
+    if (_home == _guest)
+    {
+        throw runtime_error("cannot be the same teams");
+    }
     _homePoints = 0;
     _guestPoints = 0;
 }
