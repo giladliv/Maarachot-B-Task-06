@@ -3,7 +3,7 @@
 using ball::Game;
 using ball::Team;
 
-Game::Game(Team& home, Team& guest): _home(home), _guest(guest)
+Game::Game(const string& home, const string& guest): _home(home), _guest(guest)
 {
     _homePoints = 0;
     _guestPoints = 0;
@@ -37,23 +37,23 @@ unsigned int Game::getGuestPoints() const
     return (_guestPoints);
 }
 
-void Game::addToBest()
-{
-    if (_home.getSkill() >= _guest.getSkill())
-    {
-        _homePoints = min(_homePoints + BONUS_POINTS, (unsigned int)MAX_POINTS);
-    }
-    else
-    {
-        _guestPoints = min(_guestPoints + BONUS_POINTS, (unsigned int)MAX_POINTS);
-    }
-}
+// void Game::addToBest()
+// {
+//     if (_home.getSkill() >= _guest.getSkill())
+//     {
+//         _homePoints = min(_homePoints + BONUS_POINTS, (unsigned int)MAX_POINTS);
+//     }
+//     else
+//     {
+//         _guestPoints = min(_guestPoints + BONUS_POINTS, (unsigned int)MAX_POINTS);
+//     }
+// }
 
 ostream& ball::operator<<(ostream& os, const Game& game)
 {
-    os << "home: " << game._home.getName() << " , points:"  << game.getHomePoints() << endl;
+    os << "home: " << game._home << " , points:"  << game.getHomePoints() << endl;
     os << "vs." << endl;
-    os << "guest: " << game._guest.getName() << " , points:"  << game.getGuestPoints() << endl;
+    os << "guest: " << game._guest << " , points:"  << game.getGuestPoints() << endl;
     return os;
 }
 
@@ -61,4 +61,13 @@ bool Game::isGameSet() const
 {
     return (_guestPoints >= MIN_GUEST_POINTS && _guestPoints <= MAX_POINTS &&
             _homePoints >= MIN_HOME_POINTS && _homePoints <= MAX_POINTS);
+}
+
+Game& Game::operator=(const Game& o)
+{
+    _home = o._home;
+    _guest = o._guest;
+    _homePoints = o._homePoints;
+    _guestPoints = o._guestPoints;
+    return (*this);
 }

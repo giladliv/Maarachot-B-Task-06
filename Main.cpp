@@ -11,15 +11,16 @@ int main()
     Leauge leauge(false);
     Schedule sched(leauge);
     sched.runAllGames();
-    cout << leauge << endl << endl;
-    cout << sched << endl;
+    //cout << leauge << endl << endl;
+    //cout << sched << endl;
     cout << sched._gamesVect[0][0] << endl;
-    cout << sched._games["f"].at(0) << endl;
-    unordered_map<string, unordered_map<int, Team>> m;
-    m["hello"] = {};
+    sched.pr();
+    unordered_map<string, unordered_map<unsigned int, Game>> m{};
+    
     Team a("a", 0.6);
     Team b("b", 0.6);
-    m["hello"][1] = Team("7", 0.8);
-    
+    m["hello"].emplace(1, Game("7", "0.8"));
+    cout << m["hello"].at(1) << endl;
+
     return 0;
 }

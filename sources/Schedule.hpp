@@ -20,6 +20,8 @@ namespace ball
             Game& getGame(const string& str, unsigned int round);
             vector<vector<Game>> _gamesVect;
             unordered_map<string, unordered_map<unsigned int, Game>> _games;
+            unordered_map<string, Game> _gMap;
+            void pr();
 
 
         private:
