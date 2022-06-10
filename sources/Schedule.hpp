@@ -21,12 +21,14 @@ namespace ball
 
 
         private:
-            vector<vector<Game>> _games;
+            vector<vector<Game>> _gamesVect;
+            unordered_map<string, unordered_map<int, Game&>> _games;
             Leauge& _league;
             random_device _randDev;
             mt19937 _genrator;
             std::normal_distribution<> _distributor;
             bool _isSeasonPointsSet;
+            unsigned int _numSeasons;
 
             unsigned int genHomePoints();
             unsigned int genGuestPoints();

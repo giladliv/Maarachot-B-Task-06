@@ -56,3 +56,9 @@ ostream& ball::operator<<(ostream& os, const Game& game)
     os << "guest: " << game._guest.getName() << " , points:"  << game.getGuestPoints() << endl;
     return os;
 }
+
+bool Game::isGameSet() const
+{
+    return (_guestPoints >= MIN_GUEST_POINTS && _guestPoints <= MAX_POINTS &&
+            _homePoints >= MIN_HOME_POINTS && _homePoints <= MAX_POINTS);
+}

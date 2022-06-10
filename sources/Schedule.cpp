@@ -5,7 +5,7 @@ using ball::Schedule;
 constexpr double AVG = 2.0;
 constexpr double DSTR = 6.0;
 
-Schedule::Schedule(Leauge& leauge) : _league(leauge), _isSeasonPointsSet(false)
+Schedule::Schedule(Leauge& leauge) : _league(leauge), _isSeasonPointsSet(false), _numSeasons(0)
 {
     _genrator = mt19937{_randDev()};
     // this it the best distribution for the ranges
@@ -22,15 +22,18 @@ Schedule::Schedule(Leauge& leauge) : _league(leauge), _isSeasonPointsSet(false)
  */
 void Schedule::createSeason()
 {
-    vector<string> teamsNames = _league.getTeamsList();
-    _games.clear();
     if (_league.teamSize() != NUM_TEAMS)
     {
         throw runtime_error("not enough teams in leauge - make sure its " + to_string(NUM_TEAMS));
     }
+    
+    vector<string> teamsNames = _league.getTeamsList();
+    _gamesVect.clear();
+    _games.clear();
+
     // n - 1 rounds will make each team to play one with outhers, another (n - 1) rounds will make the opposite games
-    unsigned int totalRounds = 2 * (_league.teamSize() - 1);
-    for (unsigned int roundNum = 0; roundNum < totalRounds; roundNum++)
+    _numSeasons = 2 * (_league.teamSize() - 1);
+    for (unsigned int roundNum = 0; roundNum < _numSeasons; roundNum++)
     {
         vector<Game> gamesOfRound;
         unsigned int len = teamsNames.size();
@@ -46,7 +49,7 @@ void Schedule::createSeason()
             Team& guest = (roundNum % 2 == 0) ? team2 : team1;
             gamesOfRound.push_back(Game(home, guest));
         }
-        _games.push_back(gamesOfRound);
+        _gamesVect.push_back(gamesOfRound);
         //get the last team
         string lastTeam = teamsNames.back();
         // remove it from vector
@@ -81,13 +84,13 @@ unsigned int Schedule::genGuestPoints()
 
 void Schedule::runAllGames()
 {
-    for (unsigned int i = 0; i < _games.size(); i++)
+    for (unsigned int i = 0; i < _gamesVect.size(); i++)
     {
-        for (unsigned int j = 0; j < _games[i].size(); j++)
+        for (unsigned int j = 0; j < _gamesVect[i].size(); j++)
         {
-            _games[i][j].setHomePoints(genHomePoints());
-            _games[i][j].setGuestPoints(genGuestPoints());
-            _games[i][j].addToBest();
+            _gamesVect[i][j].setHomePoints(genHomePoints());
+            _gamesVect[i][j].setGuestPoints(genGuestPoints());
+            _gamesVect[i][j].addToBest();
         }
     }
     _isSeasonPointsSet = true;
@@ -95,13 +98,13 @@ void Schedule::runAllGames()
 
 ostream& ball::operator<<(ostream& os, const Schedule& schedule)
 {
-    for (unsigned int i = 0; i < schedule._games.size(); i++)
+    for (unsigned int i = 0; i < schedule._gamesVect.size(); i++)
     {
         os << "Round " << (i+1) << endl;
         os << string(GAP, '*') << endl;
-        for (unsigned int j = 0; j < schedule._games[i].size(); j++)
+        for (unsigned int j = 0; j < schedule._gamesVect[i].size(); j++)
         {
-            os << schedule._games[i][j] << endl;
+            os << schedule._gamesVect[i][j] << endl;
         }
 
         os << string(GAP, '*') << endl << endl;

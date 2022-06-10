@@ -23,6 +23,7 @@ namespace ball
             unsigned int getGuestPoints() const;
             void addToBest();
             friend ostream& operator<<(ostream& os, const Game& game);
+            bool isGameSet() const;
 
         private:
             Team& _home;
