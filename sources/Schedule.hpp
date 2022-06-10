@@ -18,11 +18,12 @@ namespace ball
             void runAllGames();
             friend ostream& operator<<(ostream& os, const Schedule& schedule);
             Game& getGame(const string& str, unsigned int round);
+            vector<vector<Game>> _gamesVect;
+            unordered_map<string, unordered_map<unsigned int, Game>> _games;
 
 
         private:
-            vector<unordered_map<unsigned int, Game&>> _gamesVect;
-            unordered_map<string, unordered_map<unsigned int, Game&>> _games;
+            
             Leauge& _league;
 
             random_device _randDev;
@@ -35,7 +36,7 @@ namespace ball
             unsigned int genGuestPoints();
             void throwIfNotCreated();
             void addGameToSchedule(const string& strTeam1, const string& strTeam2, unsigned int r);
-
+            
             
             
             

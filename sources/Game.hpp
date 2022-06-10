@@ -24,9 +24,8 @@ namespace ball
             void addToBest();
             friend ostream& operator<<(ostream& os, const Game& game);
             bool isGameSet() const;
-            Game& operator=(const Game& other);
             string winner();
-            
+
 
         private:
             Team& _home;
