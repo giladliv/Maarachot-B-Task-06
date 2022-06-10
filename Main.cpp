@@ -13,6 +13,8 @@ int main()
     sched.runAllGames();
     cout << leauge << endl << endl;
     cout << sched << endl;
-    
+    cout << sched.getGame("c", 0) << endl;
+    cout << sched.getGame("b", 0) << endl;
+
     return 0;
 }

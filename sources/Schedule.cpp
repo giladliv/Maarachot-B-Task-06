@@ -1,6 +1,7 @@
 #include "Schedule.hpp"
 
 using ball::Schedule;
+using ball::Game;
 
 constexpr double AVG = 2.0;
 constexpr double DSTR = 6.0;
@@ -20,36 +21,100 @@ Schedule::Schedule(Leauge& leauge) : _league(leauge), _isSeasonPointsSet(false),
  * @brief according to the Round Robin tournnament creates the vector of season that contains each round
  * 
  */
+// void Schedule::createSeason()
+// {
+//     if (_league.teamSize() != NUM_TEAMS)
+//     {
+//         throw runtime_error("not enough teams in leauge - make sure its " + to_string(NUM_TEAMS));
+//     }
+
+//     vector<string> teamsNames = _league.getTeamsList();
+    
+//     _gamesVect.clear();
+//     _games.clear();
+
+//     for (string name: teamsNames)
+//     {
+//         _games[name] = {};
+//     }
+//     string strTeam1;
+//     string strTeam2;
+//     // n - 1 rounds will make each team to play one with outhers, another (n - 1) rounds will make the opposite games
+//     _numSeasons = 2 * (_league.teamSize() - 1);
+//     for (unsigned int roundNum = 0; roundNum < _numSeasons; roundNum++)
+//     {
+//         _gamesVect.push_back({});
+//         unsigned int len = teamsNames.size();
+//         for (unsigned int i = 0; i < len / 2; i++)
+//         {
+//             // take a team and its mirror
+//             strTeam1 = teamsNames[i];
+//             strTeam2 = teamsNames[len - 1 - i];
+//             Team& team1 = _league.getTeam(strTeam1);
+//             Team& team2 = _league.getTeam(strTeam2);
+            
+//             // if the round is even then the home is the first else is the guest 
+//             Team& home = (roundNum % 2 == 0) ? team1 : team2;
+//             // if the round is even the guest is the second
+//             Team& guest = (roundNum % 2 == 0) ? team2 : team1;
+//             Game g(home, guest);
+//             _gamesVect[roundNum].push_back(g);
+
+//             unsigned int ind = _gamesVect[roundNum].size() - 1;
+//             _games[strTeam1].insert({roundNum, _gamesVect[roundNum][ind]});
+//             _games[strTeam2].insert({roundNum, _gamesVect[roundNum][ind]});
+//         }
+//         //get the last team
+//         string lastTeam = teamsNames.back();
+//         // remove it from vector
+//         teamsNames.pop_back();
+//         // put it to the second var in the team
+//         teamsNames.insert(teamsNames.begin() + 1, lastTeam);
+//     }
+
+// }
+
 void Schedule::createSeason()
 {
     if (_league.teamSize() != NUM_TEAMS)
     {
         throw runtime_error("not enough teams in leauge - make sure its " + to_string(NUM_TEAMS));
     }
-    
+
     vector<string> teamsNames = _league.getTeamsList();
+    
     _gamesVect.clear();
     _games.clear();
 
+    for (int i = 0; i < teamsNames.size(); i++)
+    {
+        _gamesVect[i] = {};
+    }
+    string strTeam1;
+    string strTeam2;
     // n - 1 rounds will make each team to play one with outhers, another (n - 1) rounds will make the opposite games
     _numSeasons = 2 * (_league.teamSize() - 1);
     for (unsigned int roundNum = 0; roundNum < _numSeasons; roundNum++)
     {
-        vector<Game> gamesOfRound;
+        _gamesVect.push_back({});
         unsigned int len = teamsNames.size();
         for (unsigned int i = 0; i < len / 2; i++)
         {
             // take a team and its mirror
-            Team& team1 = _league.getTeam(teamsNames[i]);
-            Team& team2 = _league.getTeam(teamsNames[len - 1 - i]);
+            strTeam1 = teamsNames[i];
+            strTeam2 = teamsNames[len - 1 - i];
+            Team& team1 = _league.getTeam(strTeam1);
+            Team& team2 = _league.getTeam(strTeam2);
             
             // if the round is even then the home is the first else is the guest 
             Team& home = (roundNum % 2 == 0) ? team1 : team2;
             // if the round is even the guest is the second
             Team& guest = (roundNum % 2 == 0) ? team2 : team1;
-            gamesOfRound.push_back(Game(home, guest));
+            Game g(home, guest);
+            _gamesVect[roundNum][strTeam1] = g;
+            _gamesVect[roundNum][strTeam2] = g;
+
         }
-        _gamesVect.push_back(gamesOfRound);
         //get the last team
         string lastTeam = teamsNames.back();
         // remove it from vector
@@ -81,6 +146,20 @@ unsigned int Schedule::genGuestPoints()
     } while (points < MIN_GUEST_POINTS || points > MAX_POINTS);
     return points;
 }
+
+// void Schedule::runAllGames()
+// {
+//     for (unsigned int i = 0; i < _gamesVect.size(); i++)
+//     {
+//         for (unsigned int j = 0; j < _gamesVect[i].size(); j++)
+//         {
+//             _gamesVect[i][j].setHomePoints(genHomePoints());
+//             _gamesVect[i][j].setGuestPoints(genGuestPoints());
+//             _gamesVect[i][j].addToBest();
+//         }
+//     }
+//     _isSeasonPointsSet = true;
+// }
 
 void Schedule::runAllGames()
 {
@@ -118,4 +197,9 @@ void Schedule::throwIfNotCreated()
     {
         throw runtime_error("the games hasn't been given their points");
     }
+}
+
+Game& Schedule::getGame(const string& str, unsigned int r)
+{
+    return (_gamesVect[r][str]);
 }

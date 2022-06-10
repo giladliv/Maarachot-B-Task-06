@@ -62,3 +62,12 @@ bool Game::isGameSet() const
     return (_guestPoints >= MIN_GUEST_POINTS && _guestPoints <= MAX_POINTS &&
             _homePoints >= MIN_HOME_POINTS && _homePoints <= MAX_POINTS);
 }
+
+Game& Game::operator=(const Game& other)
+{
+    this->_home = other._home;
+    this->_guest = other._guest;
+    this->_homePoints = other._homePoints;
+    this->_guestPoints = other._guestPoints;
+    return (*this);
+}
