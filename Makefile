@@ -16,7 +16,10 @@ OBJECTS=$(subst sources/,objects/,$(subst .cpp,.o,$(SOURCES)))
 
 run: test
 
-test:  $(OBJECTS)
+start: main
+	./main
+
+test: TestRunner.o $(OBJECTS)
 	$(CXX) $(CXXFLAGS) $^ -o $@
 
 %.o: %.cpp $(HEADERS)
@@ -25,6 +28,8 @@ test:  $(OBJECTS)
 $(OBJECT_PATH)/%.o: $(SOURCE_PATH)/%.cpp $(HEADERS)
 	$(CXX) $(CXXFLAGS) --compile $< -o $@
 
+main: Main.o $(OBJECTS)
+	$(CXX) $(CXXFLAGS) $^ -o main
 
 tidy:
 	clang-tidy $(SOURCES) $(HEADERS) $(TIDY_FLAGS) --
@@ -32,6 +37,7 @@ tidy:
 valgrind: test
 	valgrind --tool=memcheck $(VALGRIND_FLAGS) ./test 2>&1 | { egrep "lost| at " || true; }
 
+
 clean:
-	rm -f $(OBJECTS) *.o test* 
+	rm -f $(OBJECTS) *.o test main 
 	rm -f StudentTest*.cpp

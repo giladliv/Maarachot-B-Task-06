@@ -41,10 +41,18 @@ void Game::addToBest()
 {
     if (_home.getSkill() >= _guest.getSkill())
     {
-        _homePoints = min(_homePoints + 10, (unsigned int)MAX_POINTS);
+        _homePoints = min(_homePoints + BONUS_POINTS, (unsigned int)MAX_POINTS);
     }
     else
     {
-        _guestPoints = min(_guestPoints + 10, (unsigned int)MAX_POINTS);
+        _guestPoints = min(_guestPoints + BONUS_POINTS, (unsigned int)MAX_POINTS);
     }
+}
+
+ostream& ball::operator<<(ostream& os, const Game& game)
+{
+    os << "home: " << game._home.getName() << " , points:"  << game.getHomePoints() << endl;
+    os << "vs." << endl;
+    os << "guest: " << game._guest.getName() << " , points:"  << game.getGuestPoints() << endl;
+    return os;
 }

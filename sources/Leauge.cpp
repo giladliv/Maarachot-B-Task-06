@@ -4,17 +4,39 @@ using ball::Leauge;
 using ball::Game;
 using ball::Team;
 
-Leauge::Leauge()
+Leauge::Leauge(const vector<Team>& teams)
 {
-    setRandomTeams(NUM_TEAMS);
+    if (teams.size() > NUM_TEAMS)
+    {
+        throw runtime_error("number of leagues must be positive integer and between 0 and " + to_string(NUM_TEAMS));
+    }
+    for (const Team& team: teams)
+    {
+        addTeam(team);
+    }
+    setRandomTeams(NUM_TEAMS - teams.size());
 }
 
+Leauge::Leauge(unsigned int numOfInput)
+{
+    if (numOfInput < 0 || numOfInput > NUM_TEAMS)
+    {
+        throw runtime_error("number of leagues must be positive integer and between 0 and " + to_string(NUM_TEAMS));
+    }
+    setLeaugesFromOuter(numOfInput);
+    setRandomTeams(NUM_TEAMS - numOfInput);
+}
 
-void Leauge::setRandomTeams(int num)
+void Leauge::setRandomTeams(unsigned int num)
 {
     double skillRandNum = 0;
     string strName;
-    for (char ch = 'a'; ch <= 'z' && teamSize() < num && teamSize() < NUM_TEAMS; ch++)
+    srand(time(NULL));
+    if (num < 0 || num > NUM_TEAMS)
+    {
+        throw runtime_error("number of leagues must be positive integer and between 0 and " + to_string(NUM_TEAMS));
+    }
+    for (char ch = 'a'; ch <= 'z' && teamSize() < num; ch++)
     {
         strName = ch;
         if (!isTeamExists(strName))
@@ -28,12 +50,27 @@ void Leauge::setRandomTeams(int num)
 
 void Leauge::addTeam(const string& name, double skill)
 {
+    if (_teams.size() == NUM_TEAMS)
+    {
+        throw runtime_error("reached to the max of teams");
+    }
     if (isTeamExists(name))
     {
         throw runtime_error("cannot add a team with the same name");
     }
     _teams[name] = Team(name, skill);
-    _teamsNames.push_back(name);
+    _teamsNames.insert(name);
+}
+
+void Leauge::addTeam(const string& name, const string& skill)
+{
+    double skillNum = Team::strToDouble(skill);
+    addTeam(name, skillNum);
+}
+
+void Leauge::addTeam(const Team& team)
+{
+    addTeam(team.getName(), team.getSkill());
 }
 
 bool Leauge::isTeamExists(const string& name)
@@ -48,7 +85,7 @@ unsigned int Leauge::teamSize()
 
 vector<string> Leauge::getTeamsList() const
 {
-    return _teamsNames;
+    return vector<string>(_teamsNames.begin(), _teamsNames.end());
 }
 
 Team& Leauge::getTeam(const string& name)
@@ -60,3 +97,54 @@ Team& Leauge::getTeam(const string& name)
     return _teams[name];
 }
 
+ostream& ball::operator<<(ostream& os, const Leauge& leauge)
+{
+    for (const auto& teamPair : leauge._teams)
+    {
+        os << teamPair.second << endl;
+    }
+
+    for (const string& name: leauge._teamsNames)
+    {
+        os << leauge._teams.find(name)->second << endl;
+    }
+    return os;
+}
+
+void Leauge::setLeaugesFromOuter(unsigned int numOfLeaeges)
+{
+    if (numOfLeaeges < 0 || numOfLeaeges > NUM_TEAMS)
+    {
+        throw runtime_error("number of leagues must be positive integer and between 0 and " + to_string(NUM_TEAMS));
+    }
+
+    for (int i = 1; i <= numOfLeaeges; i++)
+    {
+        try
+        {
+            cout << "Team #" << i << endl;
+            addTeam(Team::getTemFromInput());
+        }
+        catch(const std::exception& e)
+        {
+            std::cerr << e.what() << '\n';
+            // take a step back - there will no change because of the adding at the end of the loop
+            fflush(stdin);
+            i--;
+        }
+    }
+}
+
+void Leauge::removeSpacesFromEdges(string& s)
+{
+    while (!s.empty() && (s.front() == ' ' || s.front() == '\t' || s.front() == '\n'))
+    {
+        // erase the 1st char
+        s.erase(0, 1);
+    }
+
+    while (!s.empty() && (s.back() == ' ' || s.back() == '\t' || s.back() == '\n'))
+    {
+        s.pop_back();
+    }
+}

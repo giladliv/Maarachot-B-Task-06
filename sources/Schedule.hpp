@@ -6,6 +6,8 @@
 
 using namespace std;
 
+constexpr unsigned int GAP = 20;
+
 namespace ball
 {
     class Schedule
@@ -14,6 +16,9 @@ namespace ball
             Schedule(Leauge& leauge);
             void createSeason();
             void runAllGames();
+            friend ostream& operator<<(ostream& os, const Schedule& schedule);
+            
+
 
         private:
             vector<vector<Game>> _games;
@@ -21,9 +26,11 @@ namespace ball
             random_device _randDev;
             mt19937 _genrator;
             std::normal_distribution<> _distributor;
+            bool _isSeasonPointsSet;
 
             unsigned int genHomePoints();
             unsigned int genGuestPoints();
+            void throwIfNotCreated();
             
             
             
