@@ -16,26 +16,24 @@ namespace ball
     class Game
     {
         public:
-            Game() : Game("", "") {}
-            Game(const string& home, const string& guest);
+            Game(Team& home, Team& guest);
             void setHomePoints(unsigned int points);
             void setGuestPoints(unsigned int points);
             unsigned int getHomePoints() const;
             unsigned int getGuestPoints() const;
-            //void addToBest();
             friend ostream& operator<<(ostream& os, const Game& game);
-            bool isGameSet() const;
-            string winner();
-            string getHomeName() { return _home; }
-            string getGuestName() { return _guest; }
-            Game& operator=(const Game& o);
-
+            const Team& getHomeTeam();
+            const Team& getGuestTeam();
+            string getWinner();
+            string getLoser();
 
         private:
-            string _home;
-            string _guest;
+            Team& _home;
+            Team& _guest;
             unsigned int _homePoints;
             unsigned int _guestPoints;
+
+            void throwIfGameNotReady();
             
 
     };

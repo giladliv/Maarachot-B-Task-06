@@ -59,7 +59,7 @@ void Leauge::addTeam(const string& name, double skill)
         throw runtime_error("cannot add a team with the same name");
     }
     _teams[name] = Team(name, skill);
-    _teamsNames.push_back(name);
+    _teamsNames.insert(name);
 }
 
 void Leauge::addTeam(const string& name, const string& skill)
@@ -85,7 +85,7 @@ unsigned int Leauge::teamSize()
 
 vector<string> Leauge::getTeamsList() const
 {
-    return _teamsNames; //vector<string>(_teamsNames.begin(), _teamsNames.end());
+    return vector<string>(_teamsNames.begin(), _teamsNames.end());
 }
 
 Team& Leauge::getTeam(const string& name)
@@ -99,6 +99,11 @@ Team& Leauge::getTeam(const string& name)
 
 ostream& ball::operator<<(ostream& os, const Leauge& leauge)
 {
+    for (const auto& teamPair : leauge._teams)
+    {
+        os << teamPair.second << endl;
+    }
+
     for (const string& name: leauge._teamsNames)
     {
         os << leauge._teams.find(name)->second << endl;

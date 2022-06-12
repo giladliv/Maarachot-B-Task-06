@@ -1,18 +1,18 @@
 #include "Schedule.hpp"
 
 using ball::Schedule;
-using ball::Game;
 
 constexpr double AVG = 2.0;
 constexpr double DSTR = 6.0;
 
-Schedule::Schedule(Leauge& leauge) : _league(leauge), _isSeasonPointsSet(false), _numSeasons(0)
+Schedule::Schedule(Leauge& leauge) : _league(leauge), _isSeasonPointsSet(false)
 {
     _genrator = mt19937{_randDev()};
     // this it the best distribution for the ranges
     _distributor = std::normal_distribution<>{ (MIN_GUEST_POINTS / AVG), (MIN_GUEST_POINTS / DSTR)};
 
     createSeason();
+
     //me
 }
 
@@ -22,37 +22,31 @@ Schedule::Schedule(Leauge& leauge) : _league(leauge), _isSeasonPointsSet(false),
  */
 void Schedule::createSeason()
 {
+    vector<string> teamsNames = _league.getTeamsList();
+    _games.clear();
     if (_league.teamSize() != NUM_TEAMS)
     {
         throw runtime_error("not enough teams in leauge - make sure its " + to_string(NUM_TEAMS));
     }
-
-    vector<string> teamsNames = _league.getTeamsList();
-    _games.clear();
-    _gamesVect.clear();
-    for (const string& str: teamsNames)
-    {
-        _games[str] = unordered_map<unsigned int, Game*>();
-    }
     // n - 1 rounds will make each team to play one with outhers, another (n - 1) rounds will make the opposite games
-    _numSeasons = 2 * (_league.teamSize() - 1);
-    for (unsigned int roundNum = 0; roundNum < _numSeasons; roundNum++)
+    unsigned int totalRounds = 2 * (_league.teamSize() - 1);
+    for (unsigned int roundNum = 0; roundNum < totalRounds; roundNum++)
     {
-        _gamesVect.push_back({});
+        vector<Game> gamesOfRound;
         unsigned int len = teamsNames.size();
         for (unsigned int i = 0; i < len / 2; i++)
-        {   
+        {
+            // take a team and its mirror
+            Team& team1 = _league.getTeam(teamsNames[i]);
+            Team& team2 = _league.getTeam(teamsNames[len - 1 - i]);
+            
             // if the round is even then the home is the first else is the guest 
-            string home = (roundNum % 2 == 0) ? teamsNames[i] : teamsNames[len - 1 - i];
+            Team& home = (roundNum % 2 == 0) ? team1 : team2;
             // if the round is even the guest is the second
-            string guest = (roundNum % 2 == 0) ? teamsNames[len - 1 - i] :teamsNames[i];
-            _gamesVect[roundNum].push_back(Game(home, guest));
-            Game g(home, guest);
-            unsigned int ind = _gamesVect[roundNum].size() - 1;
-            cout << _gamesVect[roundNum][ind] << endl;
-            _games[home][roundNum] = &Game(home, guest);
-            _games[guest][roundNum] = &Game(home, guest);
+            Team& guest = (roundNum % 2 == 0) ? team2 : team1;
+            gamesOfRound.push_back(Game(home, guest));
         }
+        _games.push_back(gamesOfRound);
         //get the last team
         string lastTeam = teamsNames.back();
         // remove it from vector
@@ -87,13 +81,12 @@ unsigned int Schedule::genGuestPoints()
 
 void Schedule::runAllGames()
 {
-    for (unsigned int i = 0; i < _gamesVect.size(); i++)
+    for (unsigned int i = 0; i < _games.size(); i++)
     {
-        for (unsigned int j = 0; j < _gamesVect[i].size(); j++)
+        for (unsigned int j = 0; j < _games[i].size(); j++)
         {
-            _gamesVect[i][j].setHomePoints(genHomePoints());
-            _gamesVect[i][j].setGuestPoints(genGuestPoints());
-            //_gamesVect[i][j].addToBest();
+            _games[i][j].setHomePoints(genHomePoints());
+            setGamePoints(_games[i][j]);
         }
     }
     _isSeasonPointsSet = true;
@@ -101,13 +94,13 @@ void Schedule::runAllGames()
 
 ostream& ball::operator<<(ostream& os, const Schedule& schedule)
 {
-    for (unsigned int i = 0; i < schedule._gamesVect.size(); i++)
+    for (unsigned int i = 0; i < schedule._games.size(); i++)
     {
         os << "Round " << (i+1) << endl;
         os << string(GAP, '*') << endl;
-        for (unsigned int j = 0; j < schedule._gamesVect[i].size(); j++)
+        for (unsigned int j = 0; j < schedule._games[i].size(); j++)
         {
-            os << schedule._gamesVect[i][j] << endl;
+            os << schedule._games[i][j] << endl;
         }
 
         os << string(GAP, '*') << endl << endl;
@@ -123,23 +116,23 @@ void Schedule::throwIfNotCreated()
     }
 }
 
-Game& Schedule::getGame(const string& str, unsigned int r)
+void Schedule::setGamePoints(Game& game)
 {
-    return (*_games[str].at(r));
-}
+    // generate nuber of points
+    int homePoints = genHomePoints();
+    int guestPoints = genGuestPoints();
 
-
-void Schedule::pr()
-{
-    for (const auto& s: _games)
+    // if the home team has more talent so it gets bonus points
+    // cannot be over 100
+    if (game.getHomeTeam().getSkill() >= game.getGuestTeam().getSkill())
     {
-        cout << s.first <<  " -" << endl;
-        cout << string(20, '*') << endl;
-        for (const auto& r : _games[s.first] )
-        {
-            cout << r.first << endl;
-            cout << r.second << endl;
-        }
-        cout << endl << endl;
+        homePoints = min(homePoints + BONUS_POINTS, (unsigned int)MAX_POINTS);
     }
+    else
+    {
+        guestPoints = min(guestPoints + BONUS_POINTS, (unsigned int)MAX_POINTS);
+    }
+    // set the points to the teams
+    game.setHomePoints(homePoints);
+    game.setGuestPoints(guestPoints);
 }

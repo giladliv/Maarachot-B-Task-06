@@ -3,11 +3,11 @@
 using ball::Game;
 using ball::Team;
 
-Game::Game(const string& home, const string& guest): _home(home), _guest(guest)
+Game::Game(Team& home, Team& guest): _home(home), _guest(guest)
 {
-    if (_home == _guest)
+    if (&home == &guest || home.getName() == guest.getName())
     {
-        throw runtime_error("cannot be the same teams");
+        throw runtime_error("cannot have the same team as host and guest");
     }
     _homePoints = 0;
     _guestPoints = 0;
@@ -41,37 +41,56 @@ unsigned int Game::getGuestPoints() const
     return (_guestPoints);
 }
 
-// void Game::addToBest()
-// {
-//     if (_home.getSkill() >= _guest.getSkill())
-//     {
-//         _homePoints = min(_homePoints + BONUS_POINTS, (unsigned int)MAX_POINTS);
-//     }
-//     else
-//     {
-//         _guestPoints = min(_guestPoints + BONUS_POINTS, (unsigned int)MAX_POINTS);
-//     }
-// }
-
 ostream& ball::operator<<(ostream& os, const Game& game)
 {
-    os << "home: " << game._home << " , points:"  << game.getHomePoints() << endl;
+    os << "home: " << game._home.getName() << " , points:"  << game.getHomePoints() << endl;
     os << "vs." << endl;
-    os << "guest: " << game._guest << " , points:"  << game.getGuestPoints() << endl;
+    os << "guest: " << game._guest.getName() << " , points:"  << game.getGuestPoints() << endl;
     return os;
 }
 
-bool Game::isGameSet() const
+const Team& Game::getHomeTeam()
 {
-    return (_guestPoints >= MIN_GUEST_POINTS && _guestPoints <= MAX_POINTS &&
-            _homePoints >= MIN_HOME_POINTS && _homePoints <= MAX_POINTS);
+    return _home;
 }
 
-Game& Game::operator=(const Game& o)
+const Team& Game::getGuestTeam()
 {
-    _home = o._home;
-    _guest = o._guest;
-    _homePoints = o._homePoints;
-    _guestPoints = o._guestPoints;
-    return (*this);
+    return _guest;
 }
+
+string Game::getWinner()
+{
+    throwIfGameNotReady();
+    // home leads - return home name
+    if (_homePoints > _guestPoints)
+    {
+        return _home.getName();
+    }
+    // guest leads return guest name
+    if (_homePoints < _guestPoints)
+    {
+        return _guest.getName();
+    }
+    
+    // if home's skill is better than guest - return its name, else the guest is the winner
+    return ((_home.getSkill() >= _guest.getSkill()) ? _home.getName() : _guest.getName());
+}
+
+string Game::getLoser()
+{
+    // if home is not the winner than home is the loser
+    // else is the guest
+    return (getWinner() != _home.getName() ? _home.getName() : _guest.getName());
+
+}
+
+void Game::throwIfGameNotReady()
+{
+    if (_homePoints < MIN_HOME_POINTS || _homePoints > MAX_POINTS ||
+        _guestPoints < MIN_GUEST_POINTS || _guestPoints > MAX_POINTS)
+    {
+        throw runtime_error("the game is not ready - please set points to home and guest");
+    }
+}
+

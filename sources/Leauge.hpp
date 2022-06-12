@@ -36,7 +36,7 @@ namespace ball
             void setRandomTeams(unsigned int num);
             void setLeaugesFromOuter(unsigned int numOfLeaeges);
             unordered_map<string, Team> _teams;
-            vector<string> _teamsNames;
+            set<string> _teamsNames;
     };
     
 }
