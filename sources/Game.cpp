@@ -49,17 +49,17 @@ ostream& ball::operator<<(ostream& os, const Game& game)
     return os;
 }
 
-const Team& Game::getHomeTeam()
+const Team& Game::getHomeTeam() const
 {
     return _home;
 }
 
-const Team& Game::getGuestTeam()
+const Team& Game::getGuestTeam() const
 {
     return _guest;
 }
 
-string Game::getWinner()
+string Game::getWinner() const
 {
     throwIfGameNotReady();
     // home leads - return home name
@@ -77,7 +77,7 @@ string Game::getWinner()
     return ((_home.getSkill() >= _guest.getSkill()) ? _home.getName() : _guest.getName());
 }
 
-string Game::getLoser()
+string Game::getLoser() const
 {
     // if home is not the winner than home is the loser
     // else is the guest
@@ -85,7 +85,7 @@ string Game::getLoser()
 
 }
 
-void Game::throwIfGameNotReady()
+void Game::throwIfGameNotReady() const
 {
     if (_homePoints < MIN_HOME_POINTS || _homePoints > MAX_POINTS ||
         _guestPoints < MIN_GUEST_POINTS || _guestPoints > MAX_POINTS)

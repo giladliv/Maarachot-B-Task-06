@@ -22,10 +22,10 @@ namespace ball
             unsigned int getHomePoints() const;
             unsigned int getGuestPoints() const;
             friend ostream& operator<<(ostream& os, const Game& game);
-            const Team& getHomeTeam();
-            const Team& getGuestTeam();
-            string getWinner();
-            string getLoser();
+            const Team& getHomeTeam() const;
+            const Team& getGuestTeam() const;
+            string getWinner() const;
+            string getLoser() const;
 
         private:
             Team& _home;
@@ -33,7 +33,7 @@ namespace ball
             unsigned int _homePoints;
             unsigned int _guestPoints;
 
-            void throwIfGameNotReady();
+            void throwIfGameNotReady() const;
             
 
     };

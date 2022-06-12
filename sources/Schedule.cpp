@@ -1,6 +1,8 @@
 #include "Schedule.hpp"
 
+
 using ball::Schedule;
+using ball::Game;
 
 constexpr double AVG = 2.0;
 constexpr double DSTR = 6.0;
@@ -81,15 +83,20 @@ unsigned int Schedule::genGuestPoints()
 
 void Schedule::runAllGames()
 {
+    _isSeasonPointsSet = false;
     for (unsigned int i = 0; i < _games.size(); i++)
     {
         for (unsigned int j = 0; j < _games[i].size(); j++)
         {
-            _games[i][j].setHomePoints(genHomePoints());
             setGamePoints(_games[i][j]);
         }
     }
     _isSeasonPointsSet = true;
+}
+
+const vector<vector<Game>>& Schedule::getGames() const
+{
+    return _games;
 }
 
 ostream& ball::operator<<(ostream& os, const Schedule& schedule)
@@ -108,7 +115,7 @@ ostream& ball::operator<<(ostream& os, const Schedule& schedule)
     return os;
 }
 
-void Schedule::throwIfNotCreated()
+void Schedule::throwIfNotCreated() const
 {
     if (!_isSeasonPointsSet)
     {
@@ -119,8 +126,8 @@ void Schedule::throwIfNotCreated()
 void Schedule::setGamePoints(Game& game)
 {
     // generate nuber of points
-    int homePoints = genHomePoints();
-    int guestPoints = genGuestPoints();
+    unsigned int homePoints = genHomePoints();
+    unsigned int guestPoints = genGuestPoints();
 
     // if the home team has more talent so it gets bonus points
     // cannot be over 100
@@ -136,3 +143,9 @@ void Schedule::setGamePoints(Game& game)
     game.setHomePoints(homePoints);
     game.setGuestPoints(guestPoints);
 }
+
+vector<string> Schedule::getTeamNames()
+{
+    return _league.getTeamsList();
+}
+

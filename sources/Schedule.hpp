@@ -17,6 +17,9 @@ namespace ball
             void createSeason();
             void runAllGames();
             friend ostream& operator<<(ostream& os, const Schedule& schedule);
+            const vector<vector<Game>>& getGames() const;
+            void throwIfNotCreated() const;
+            vector<string> getTeamNames();
 
         private:
             vector<vector<Game>> _games;
@@ -25,11 +28,12 @@ namespace ball
             mt19937 _genrator;
             std::normal_distribution<> _distributor;
             bool _isSeasonPointsSet;
+            //unordered_map<string, vector<Game*>> _gMap;
 
             unsigned int genHomePoints();
             unsigned int genGuestPoints();
-            void throwIfNotCreated();
-
+            
+            //void addTeamsToMap(const string& strTeam1, const string& strTeam2);
             void setGamePoints(Game& game);
             
             

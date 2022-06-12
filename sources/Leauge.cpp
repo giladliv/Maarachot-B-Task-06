@@ -99,11 +99,6 @@ Team& Leauge::getTeam(const string& name)
 
 ostream& ball::operator<<(ostream& os, const Leauge& leauge)
 {
-    for (const auto& teamPair : leauge._teams)
-    {
-        os << teamPair.second << endl;
-    }
-
     for (const string& name: leauge._teamsNames)
     {
         os << leauge._teams.find(name)->second << endl;
