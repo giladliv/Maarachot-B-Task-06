@@ -12,7 +12,7 @@
 
 using namespace std;
 
-constexpr unsigned int NUM_TEAMS = 6;
+constexpr unsigned int NUM_TEAMS = 20;
 constexpr unsigned int NUM_RAND_MAX = RAND_MAX - 1;
 
 namespace ball

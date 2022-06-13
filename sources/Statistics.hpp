@@ -6,6 +6,10 @@
 
 using namespace std;
 
+constexpr unsigned int MAX_IN_ROW = 5;
+
+
+
 namespace ball
 {
     class Statistics
@@ -13,10 +17,13 @@ namespace ball
         public:
             Statistics(Schedule& schedule);
             ~Statistics();
-            // void topTeams();
+            void printTotalGame();
+            void topTeams(unsigned int numOfTeams);
             void longestWinRow();
             void longestLoseRow();
             //void teamsThatScoredMore();
+            static void beutifyTable(vector<vector<string>>& table);
+            static void printTable(const vector<vector<string>>& table);
 
         private:
             Schedule& _schedule;

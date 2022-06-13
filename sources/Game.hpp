@@ -26,6 +26,7 @@ namespace ball
             const Team& getGuestTeam() const;
             string getWinner() const;
             string getLoser() const;
+            unsigned int getPointsOfTeam(const string& name) const;
 
         private:
             Team& _home;

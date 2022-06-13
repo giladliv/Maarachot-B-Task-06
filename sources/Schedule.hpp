@@ -7,6 +7,10 @@
 using namespace std;
 
 constexpr unsigned int GAP = 20;
+constexpr unsigned int IN_PNTS = 0;
+constexpr unsigned int OUT_PNTS = 1;
+constexpr unsigned int WIN = 2;
+constexpr unsigned int LOSE = 3;
 
 namespace ball
 {
@@ -20,6 +24,8 @@ namespace ball
             const vector<vector<Game>>& getGames() const;
             void throwIfNotCreated() const;
             vector<string> getTeamNames();
+            unordered_map<string, vector<unsigned int>> getTeamsScore();
+
 
         private:
             vector<vector<Game>> _games;
@@ -28,7 +34,7 @@ namespace ball
             mt19937 _genrator;
             std::normal_distribution<> _distributor;
             bool _isSeasonPointsSet;
-            //unordered_map<string, vector<Game*>> _gMap;
+            unsigned int _totalRoundNum;
 
             unsigned int genHomePoints();
             unsigned int genGuestPoints();

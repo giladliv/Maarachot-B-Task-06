@@ -94,3 +94,16 @@ void Game::throwIfGameNotReady() const
     }
 }
 
+unsigned int Game::getPointsOfTeam(const string& name) const
+{
+    if (name == _home.getName())
+    {
+        return _homePoints;
+    }
+    if (name == _guest.getName())
+    {
+        return _guestPoints;
+    }
+
+    throw runtime_error("not a name in the game");
+}

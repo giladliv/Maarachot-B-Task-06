@@ -7,7 +7,7 @@ using ball::Game;
 constexpr double AVG = 2.0;
 constexpr double DSTR = 6.0;
 
-Schedule::Schedule(Leauge& leauge) : _league(leauge), _isSeasonPointsSet(false)
+Schedule::Schedule(Leauge& leauge) : _league(leauge), _isSeasonPointsSet(false), _totalRoundNum(0)
 {
     _genrator = mt19937{_randDev()};
     // this it the best distribution for the ranges
@@ -31,8 +31,8 @@ void Schedule::createSeason()
         throw runtime_error("not enough teams in leauge - make sure its " + to_string(NUM_TEAMS));
     }
     // n - 1 rounds will make each team to play one with outhers, another (n - 1) rounds will make the opposite games
-    unsigned int totalRounds = 2 * (_league.teamSize() - 1);
-    for (unsigned int roundNum = 0; roundNum < totalRounds; roundNum++)
+    _totalRoundNum = 2 * (_league.teamSize() - 1);
+    for (unsigned int roundNum = 0; roundNum < _totalRoundNum; roundNum++)
     {
         vector<Game> gamesOfRound;
         unsigned int len = teamsNames.size();
@@ -149,3 +149,36 @@ vector<string> Schedule::getTeamNames()
     return _league.getTeamsList();
 }
 
+unordered_map<string, vector<unsigned int>> Schedule::getTeamsScore()
+{
+    unordered_map<string, vector<unsigned int>> teamScore;
+    
+    for(const string& name: getTeamNames())
+    {
+        teamScore[name] = vector<unsigned int>{4, 0};
+    }
+
+    string winner;
+    string loser;
+    for (unsigned int i = 0; i < _games.size(); i++)
+    {
+        for (const Game& game: _games[i])
+        {
+            winner = game.getWinner();
+            loser = game.getLoser();
+            // for the winner:
+            teamScore[winner][IN_PNTS] += game.getPointsOfTeam(winner);
+            teamScore[winner][OUT_PNTS] += game.getPointsOfTeam(loser);
+            
+            // set the points to the loser
+            teamScore[loser][IN_PNTS] += game.getPointsOfTeam(loser);
+            teamScore[loser][OUT_PNTS] += game.getPointsOfTeam(winner);
+            
+            // set the winning number wo winner and losing to loser
+            teamScore[winner][WIN] += 1;
+            teamScore[loser][LOSE] += 1;
+        }
+    }
+
+    return (teamScore);
+}
