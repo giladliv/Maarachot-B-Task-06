@@ -81,7 +81,7 @@ string Game::getLoser() const
 {
     // if home is not the winner than home is the loser
     // else is the guest
-    return (getWinner() != _home.getName() ? _home.getName() : _guest.getName());
+    return ((getWinner() != _home.getName()) ? _home.getName() : _guest.getName());
 
 }
 

@@ -1,5 +1,5 @@
 #include "Statistics.hpp"
-#include <map>
+
 
 using ball::Statistics;
 
@@ -49,44 +49,6 @@ void Statistics::longestLoseRow()
     longestWinLoserRunner(false);
 }
 
-void Statistics::longestWinLoserRunner(bool checkForWin)
-{
-    unordered_map<string, vector<bool>> winTable = getWinnings();
-    unordered_map<string, unsigned int> numOfLongest;
-    unsigned int maxRow = 0;
-    bool dataBreaker = !checkForWin;
-    for (const auto& winPair : winTable)
-    {
-        const string& name = winPair.first;
-        const vector<bool>& winsVect = winPair.second;
-        numOfLongest[name] = 0;
-        unsigned int counter = 0;
-        for (auto it = winsVect.begin(); it != winsVect.end(); )
-        {
-            // find the next occorence of the opposite - if win then search for false
-            // if lose search for win (lose)
-            auto findIt = find(it, winsVect.end(), dataBreaker);
-            counter = findIt - it;
-            numOfLongest[name] = max(counter, numOfLongest[name]);
-            maxRow = max(maxRow, counter);
-            
-            // set the iterator for over the first that found - if the end - leave it be
-            it = (findIt != winsVect.end()) ? findIt + 1 : findIt;
-        }
-    }
-
-    cout << "the longest number of " << (checkForWin ? "winning" : "losing");
-    cout << " games in a row is:  " << maxRow << "  games" << endl;
-    cout << "the teams are: " << endl;
-    for (const auto& winPair: numOfLongest)
-    {
-        if (winPair.second == maxRow)
-        {
-            cout << winPair.first << endl;
-        }
-    }
-}
-
 
 void Statistics::topTeams(unsigned int numOfTeams)
 {
@@ -100,8 +62,7 @@ void Statistics::topTeams(unsigned int numOfTeams)
     {
         unsigned int points = teamScore[name][IN_PNTS];
         unsigned int wins = teamScore[name][WIN];
-        points *= wins;
-        pointsGame.insert({points, name});
+        pointsGame.insert({points*wins, name});
     }
     cout << "The " << numOfTeams << " teams in the lead are: " << endl;
     int counter = 0;
@@ -111,8 +72,9 @@ void Statistics::topTeams(unsigned int numOfTeams)
         {
             break;
         }
-        cout << "#" << counter + 1 << " : " << it->second;
-        cout << "\t(" << teamScore[it->second][WIN] << ")" << endl;
+        string name = it->second;
+        cout << "#" << counter + 1 << " : " << name;
+        cout << "\t(" << teamScore[name][WIN] << ")" << endl;
         counter++;
     }
     cout << endl;
@@ -165,6 +127,108 @@ void Statistics::printTotalGame()
     cout << string (MAX_POINTS, '*') << endl;
     cout << string (MAX_POINTS, '*') << endl << endl;
 }
+
+void Statistics::teamsThatScoredMore()
+{
+    // we need here the over one
+    printScoresOverMoreLess(true);
+}
+
+void Statistics::teamsThatScoredLess()
+{
+    // we need here the lesser one
+    printScoresOverMoreLess(false);
+}
+
+void Statistics::printScoresOverMoreLess(bool isMore)
+{
+    unordered_map<string, vector<unsigned int>> teamScore = _schedule.getTeamsScore();
+    set<string> namesAndPoints;
+    for (const string& name: _schedule.getTeamNames())
+    {
+        unsigned int inPoints = teamScore[name][IN_PNTS];
+        unsigned int outPoints = teamScore[name][OUT_PNTS];
+        // according to the more flag - if scores are over print check if the scores are over
+        // if the flag is false check if in is less then out
+        if ((isMore && inPoints > outPoints) || (!isMore && inPoints <= outPoints))
+        {
+            namesAndPoints.insert(name + "\t(" + to_string(inPoints) + "/" + to_string(outPoints) + ")");
+        }
+    }
+    // print the outputs
+    cout << "The teams that scored more than being scored to are:" << endl;
+    for (const string& line: namesAndPoints)
+    {
+        cout << line << endl;
+    }
+    cout << endl;
+}
+
+void Statistics::longestWinLoserRunner(bool checkForWin)
+{
+    unordered_map<string, vector<bool>> winTable = getWinnings();
+    unordered_map<string, unsigned int> numOfLongest;
+    unsigned int maxRow = 0;
+    bool dataBreaker = !checkForWin;
+    for (const auto& winPair : winTable)
+    {
+        const string& name = winPair.first;
+        const vector<bool>& winsVect = winPair.second;
+        numOfLongest[name] = 0;
+        unsigned int counter = 0;
+        for (auto it = winsVect.begin(); it != winsVect.end(); )
+        {
+            // find the next occorence of the opposite - if win then search for false
+            // if lose search for win (lose)
+            auto findIt = find(it, winsVect.end(), dataBreaker);
+            counter = findIt - it;
+            numOfLongest[name] = max(counter, numOfLongest[name]);
+            maxRow = max(maxRow, counter);
+            
+            // set the iterator for over the first that found - if the end - leave it be
+            it = (findIt != winsVect.end()) ? findIt + 1 : findIt;
+        }
+    }
+
+    cout << "the longest number of " << (checkForWin ? "winning" : "losing");
+    cout << " games in a row is:  " << maxRow << "  games" << endl;
+    cout << "the teams are: " << endl;
+    for (const auto& winPair: numOfLongest)
+    {
+        if (winPair.second == maxRow)
+        {
+            cout << winPair.first << endl;
+        }
+    }
+    cout << endl;
+}
+
+
+void Statistics::printSkillVsPoints()
+{
+    unordered_map<string, vector<unsigned int>> teamScore = _schedule.getTeamsScore();
+    multimap<double, string> pointsGame;
+    for (const string& name: _schedule.getTeamNames())
+    {
+        pointsGame.insert({_schedule.getLeuage().getTeam(name).getSkill(), name});
+    }
+    // create the table that has 4 cols
+    vector<vector<string>> table;
+    table.push_back({"Name", "Skill factor", "Wins ratio", "Points Ratio"});    // first line - metadata
+    unsigned int rounds = _schedule.getTotalRounds();
+    double maxPoints = (double)rounds * MAX_POINTS;
+    for (const auto& pairMap: pointsGame)
+    {
+        string name = pairMap.second;
+        table.push_back({name, 
+                        to_string(pairMap.first),
+                        to_string((double)teamScore[name][WIN] / rounds),       // devide the win number by the total rounds
+                        to_string(teamScore[name][IN_PNTS] / maxPoints)});      // devide the total points by the total amount of points
+    }
+    printTable(table);
+    cout << endl;
+}
+
 
 void Statistics::beutifyTable(vector<vector<string>>& table)
 {

@@ -25,7 +25,8 @@ namespace ball
             void throwIfNotCreated() const;
             vector<string> getTeamNames();
             unordered_map<string, vector<unsigned int>> getTeamsScore();
-
+            Leauge& getLeuage(){ return _league; }
+            unsigned int getTotalRounds() const { return _totalRoundNum; }
 
         private:
             vector<vector<Game>> _games;

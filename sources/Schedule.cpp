@@ -3,6 +3,9 @@
 
 using ball::Schedule;
 using ball::Game;
+#include <iterator>     // std::ostream_iterator
+#include <vector>       // std::vector
+#include <algorithm>
 
 constexpr double AVG = 2.0;
 constexpr double DSTR = 6.0;
@@ -108,10 +111,12 @@ ostream& ball::operator<<(ostream& os, const Schedule& schedule)
         for (unsigned int j = 0; j < schedule._games[i].size(); j++)
         {
             os << schedule._games[i][j] << endl;
+            const Game& g = schedule._games[i][j];
         }
-
+        
         os << string(GAP, '*') << endl << endl;
     }
+
     return os;
 }
 
@@ -155,7 +160,7 @@ unordered_map<string, vector<unsigned int>> Schedule::getTeamsScore()
     
     for(const string& name: getTeamNames())
     {
-        teamScore[name] = vector<unsigned int>{4, 0};
+        teamScore[name] = vector<unsigned int>{0, 0, 0, 0};
     }
 
     string winner;
@@ -179,6 +184,7 @@ unordered_map<string, vector<unsigned int>> Schedule::getTeamsScore()
             teamScore[loser][LOSE] += 1;
         }
     }
+
 
     return (teamScore);
 }
