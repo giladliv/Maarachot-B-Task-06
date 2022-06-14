@@ -264,6 +264,11 @@ void Statistics::beutifyTable(vector<vector<string>>& table)
 
 }
 
+/**
+ * @brief when giving 2d array print it as table
+ * 
+ * @param tablePrint 2d vector as table
+ */
 void Statistics::printTable(const vector<vector<string>>& tablePrint)
 {
     vector<vector<string>> table(tablePrint);
