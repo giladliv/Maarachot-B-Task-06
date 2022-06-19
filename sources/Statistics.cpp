@@ -98,12 +98,13 @@ void Statistics::printTotalGame()
         {
             table = {{""}, {"win/lose"}, {"score diff"}};
         }
-        
+        // get the in points
         int pointsIn = (int)teamScore[name][IN_PNTS];
-        int pointsOut =  (int)teamScore[name][OUT_PNTS];
-        table[0].push_back(name);
-        table[1].push_back(to_string(pointsIn) + "/" + to_string(pointsOut));
-        table[2].push_back(to_string(pointsIn - pointsOut));
+        int pointsOut =  (int)teamScore[name][OUT_PNTS];    // get the out points
+        table[0].push_back(name);                           // the first vector is the names
+        // put the num of wins and loses
+        table[1].push_back(to_string(teamScore[name][WIN]) + "/" + to_string(teamScore[name][LOSE]));
+        table[2].push_back(to_string(pointsIn - pointsOut));    // set the diff of the baskets
         // add the count - hoe many data in row
         counter++;
         
@@ -142,6 +143,7 @@ void Statistics::teamsThatScoredLess()
 
 void Statistics::printScoresOverMoreLess(bool isMore)
 {
+    // throws if not good
     unordered_map<string, vector<unsigned int>> teamScore = _schedule.getTeamsScore();
     set<string> namesAndPoints;
     for (const string& name: _schedule.getTeamNames())
@@ -166,6 +168,8 @@ void Statistics::printScoresOverMoreLess(bool isMore)
 
 void Statistics::longestWinLoserRunner(bool checkForWin)
 {
+    _schedule.throwIfNotCreated();
+    
     unordered_map<string, vector<bool>> winTable = getWinnings();
     unordered_map<string, unsigned int> numOfLongest;
     unsigned int maxRow = 0;
@@ -176,6 +180,7 @@ void Statistics::longestWinLoserRunner(bool checkForWin)
         const vector<bool>& winsVect = winPair.second;
         numOfLongest[name] = 0;
         unsigned int counter = 0;
+        // reach to the next occurance
         for (auto it = winsVect.begin(); it != winsVect.end(); )
         {
             // find the next occorence of the opposite - if win then search for false
@@ -206,6 +211,7 @@ void Statistics::longestWinLoserRunner(bool checkForWin)
 
 void Statistics::printSkillVsPoints()
 {
+    _schedule.throwIfNotCreated();
     unordered_map<string, vector<unsigned int>> teamScore = _schedule.getTeamsScore();
     multimap<double, string> pointsGame;
     for (const string& name: _schedule.getTeamNames())
@@ -216,7 +222,7 @@ void Statistics::printSkillVsPoints()
     vector<vector<string>> table;
     table.push_back({"Name", "Skill factor", "Wins ratio", "Points Ratio"});    // first line - metadata
     unsigned int rounds = _schedule.getTotalRounds();
-    double maxPoints = (double)rounds * MAX_POINTS;
+    double maxPoints = (double)rounds * MAX_POINTS;     // compute the possible max points
     for (const auto& pairMap: pointsGame)
     {
         string name = pairMap.second;

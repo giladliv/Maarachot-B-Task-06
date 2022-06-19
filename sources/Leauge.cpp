@@ -36,7 +36,8 @@ void Leauge::setRandomTeams(unsigned int num)
     {
         throw runtime_error("number of leagues must be positive integer and between 0 and " + to_string(NUM_TEAMS));
     }
-    for (char ch = 'a'; ch <= 'z' && teamSize() < num; ch++)
+    int count = 0;
+    for (char ch = 'a'; ch <= 'z' && count < num && teamSize() < NUM_TEAMS; ch++)
     {
         strName = ch;
         if (!isTeamExists(strName))

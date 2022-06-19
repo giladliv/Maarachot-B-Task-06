@@ -156,6 +156,7 @@ vector<string> Schedule::getTeamNames()
 
 unordered_map<string, vector<unsigned int>> Schedule::getTeamsScore()
 {
+    throwIfNotCreated();
     unordered_map<string, vector<unsigned int>> teamScore;
     
     for(const string& name: getTeamNames())
